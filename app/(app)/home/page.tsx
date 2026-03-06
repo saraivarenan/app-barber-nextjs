@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getSession } from '@/lib/auth'
 import { getSchedules } from '@/actions/schedules'
 import { getContacts } from '@/actions/contacts'

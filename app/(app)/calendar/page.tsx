@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getSchedules } from '@/actions/schedules'
 import { getContacts } from '@/actions/contacts'
 import CalendarClient from '@/components/calendar/CalendarClient'
