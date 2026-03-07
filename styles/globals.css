@@ -541,3 +541,217 @@ html, body {
   text-transform: uppercase; letter-spacing: 1px;
   padding: 14px 20px 6px;
 }
+
+/* ── PROPORTIONAL TIMELINE ── */
+.tl-scroll {
+  margin: 0 20px 0;
+  height: calc(100vh - 240px);
+  overflow-y: auto;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.tl-canvas {
+  position: relative;
+  width: 100%;
+}
+.tl-gridrow {
+  position: absolute; left: 0; right: 0;
+  display: flex; align-items: flex-start;
+  pointer-events: none;
+}
+.tl-hourlabel {
+  width: 52px; flex-shrink: 0;
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); text-align: right;
+  padding-right: 8px; padding-top: 2px;
+  line-height: 1;
+}
+.tl-hourlabel.past { opacity: .3 }
+.tl-hourlabel.now  { color: var(--gold); font-size: 12px }
+.tl-gridline {
+  flex: 1; height: 1px;
+  background: var(--border); margin-top: 6px; opacity: .5;
+}
+
+/* Empty clickable slots */
+.tl-empty-slot {
+  position: absolute; left: 52px; right: 8px;
+  border-radius: 8px; cursor: pointer;
+  transition: background .12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.tl-empty-slot:hover {
+  background: rgba(255,255,255,.04);
+}
+.tl-empty-slot:hover::after {
+  content: '＋ novo agendamento';
+  font-size: 11px; color: var(--muted);
+}
+
+/* Filled schedule block */
+.tl-block-filled {
+  position: absolute; left: 52px; right: 8px;
+  background: var(--card); border: 1px solid var(--gold);
+  border-radius: 12px; cursor: pointer;
+  display: flex; align-items: center;
+  padding: 8px 12px; gap: 10px;
+  transition: border-color .15s, background .15s;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(201,168,76,.1);
+}
+.tl-block-filled:hover {
+  background: rgba(201,168,76,.07);
+}
+
+/* Now indicator */
+.tl-now-line {
+  position: absolute; left: 0; right: 0;
+  display: flex; align-items: center;
+  pointer-events: none; z-index: 5;
+}
+.tl-now-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold); flex-shrink: 0; margin-left: 46px;
+}
+.tl-now-track {
+  flex: 1; height: 1.5px;
+  background: var(--gold); opacity: .7;
+  margin-right: 8px;
+}
+
+/* ── SERVICES ── */
+.service-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px; cursor: pointer; transition: border-color .2s;
+}
+.service-card:hover { border-color: var(--gold) }
+.service-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--gold); color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; flex-shrink: 0;
+}
+.service-info { flex: 1 }
+.service-name { font-size: 15px; font-weight: 600; margin-bottom: 4px }
+.service-meta { display: flex; gap: 8px; flex-wrap: wrap }
+.service-tag {
+  font-size: 11px; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 2px 8px; border-radius: 20px;
+}
+.service-tag-gold {
+  color: var(--gold);
+  background: rgba(201,168,76,.1); border-color: rgba(201,168,76,.2);
+}
+
+/* Duration picker grid */
+.duration-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.duration-opt {
+  padding: 10px 0; text-align: center; border-radius: 10px;
+  border: 1px solid var(--border); font-size: 13px; font-weight: 600;
+  color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.duration-opt.selected {
+  background: var(--gold); color: #000; border-color: var(--gold);
+}
+.duration-opt:hover:not(.selected) { border-color: var(--text); color: var(--text) }
+
+/* Time window display */
+.time-window {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 14px; font-weight: 600; white-space: nowrap;
+  display: flex; align-items: center;
+}
+
+/* Service picker in modal */
+.service-picker {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.service-pick-opt {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--border); cursor: pointer; transition: all .15s;
+}
+.service-pick-opt.selected {
+  border-color: var(--gold); background: rgba(201,168,76,.08);
+}
+.service-pick-opt:hover:not(.selected) { border-color: var(--muted) }
+.spopt-name { font-size: 14px; font-weight: 600 }
+.spopt-meta { font-size: 12px; color: var(--muted) }
+
+/* ── CALENDAR FILTERS ── */
+.cal-filters {
+  padding: 12px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cal-filter-select {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 14px;
+  outline: none;
+  cursor: pointer;
+}
+.cal-filter-select:focus { border-color: var(--gold) }
+
+.month-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.month-arrow {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 34px; height: 34px; flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.month-arrow:hover { border-color: var(--gold) }
+
+.month-pills {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.month-pills::-webkit-scrollbar { display: none }
+
+.month-pill {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.month-pill:hover  { color: var(--text) }
+.month-pill.active {
+  background: var(--gold);
+  color: #000;
+  border-color: var(--gold);
+}

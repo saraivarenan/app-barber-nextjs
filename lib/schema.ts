@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, serial, text, integer, boolean, timestamp, numeric } from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
   id:         serial('id').primaryKey(),
@@ -7,6 +7,15 @@ export const users = pgTable('users', {
   password:   text('password').notNull(),
   isAdmin:    boolean('is_admin').notNull().default(false),
   isBlocked:  boolean('is_blocked').notNull().default(false),
+  createdAt:  timestamp('created_at').defaultNow(),
+})
+
+export const services = pgTable('services', {
+  id:         serial('id').primaryKey(),
+  userId:     integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name:       text('name').notNull(),
+  price:      numeric('price', { precision: 10, scale: 2 }).notNull().default('0'),
+  duration:   integer('duration').notNull().default(60), // minutes
   createdAt:  timestamp('created_at').defaultNow(),
 })
 
@@ -26,6 +35,8 @@ export const schedules = pgTable('schedules', {
   date:       text('date').notNull(),
   time:       text('time').notNull(),
   service:    text('service').notNull().default('Corte'),
+  duration:   integer('duration').notNull().default(60),
+  price:      numeric('price', { precision: 10, scale: 2 }).default('0'),
   recurrence: text('recurrence').notNull().default('none'),
   recurDays:  text('recur_days').notNull().default('[]'),
   notes:      text('notes').default(''),
@@ -33,5 +44,6 @@ export const schedules = pgTable('schedules', {
 })
 
 export type User     = typeof users.$inferSelect
+export type Service  = typeof services.$inferSelect
 export type Contact  = typeof contacts.$inferSelect
 export type Schedule = typeof schedules.$inferSelect

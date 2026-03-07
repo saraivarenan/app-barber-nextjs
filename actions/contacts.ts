@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { db } from '@/lib/db'
+import { createDb } from '@/lib/db'
 import { contacts } from '@/lib/schema'
 import { eq, and } from 'drizzle-orm'
 import { getSession } from '@/lib/auth'
@@ -9,6 +9,7 @@ import { getSession } from '@/lib/auth'
 export async function getContacts() {
   const session = await getSession()
   if (!session) return []
+  const db = createDb()
   return db.query.contacts.findMany({
     where: eq(contacts.userId, session.id),
     orderBy: (c, { asc }) => [asc(c.name)]
@@ -18,6 +19,7 @@ export async function getContacts() {
 export async function createContact(name: string, phone: string) {
   const session = await getSession()
   if (!session) return { error: 'Não autorizado' }
+  const db = createDb()
   const [row] = await db.insert(contacts)
     .values({ userId: session.id, name: name.trim(), phone })
     .returning()
@@ -28,6 +30,7 @@ export async function createContact(name: string, phone: string) {
 export async function updateContact(id: number, name: string, phone: string) {
   const session = await getSession()
   if (!session) return { error: 'Não autorizado' }
+  const db = createDb()
   const [row] = await db.update(contacts)
     .set({ name, phone })
     .where(and(eq(contacts.id, id), eq(contacts.userId, session.id)))
@@ -39,6 +42,7 @@ export async function updateContact(id: number, name: string, phone: string) {
 export async function deleteContact(id: number) {
   const session = await getSession()
   if (!session) return { error: 'Não autorizado' }
+  const db = createDb()
   await db.delete(contacts)
     .where(and(eq(contacts.id, id), eq(contacts.userId, session.id)))
   revalidatePath('/contacts')
