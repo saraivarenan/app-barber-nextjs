@@ -9,26 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.9.3",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "cookies-next": "^4.2.1",
+    "date-fns": "^3.6.0",
+    "drizzle-kit": "^0.21.4",
+    "drizzle-orm": "^0.30.10",
+    "jsonwebtoken": "^9.0.2",
     "next": "14.2.5",
     "react": "^18",
-    "react-dom": "^18",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "@neondatabase/serverless": "^0.9.3",
-    "drizzle-orm": "^0.30.10",
-    "drizzle-kit": "^0.21.4",
-    "cookies-next": "^4.2.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^3.6.0"
+    "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.6",
-    "typescript": "^5",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5"
+    "eslint-config-next": "14.2.5",
+    "typescript": "^5",
+    "vitest": "^4.1.0"
   }
 }
