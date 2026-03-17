@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { dateStr } from '@/lib/recurrence'
+import { dateStr, getSchedulesForDate } from '@/lib/recurrence'  // ✅ importa getSchedulesForDate
 import ScheduleModal from '@/components/calendar/ScheduleModal'
 
 const RL = { none:'', weekly:'↺ Semanal', bimonthly:'↺ 2×/mês', monthly:'↺ Mensal' } as any
@@ -43,8 +43,9 @@ export default function DayTimeline({ selectedDate, schedules, contacts, service
   const nowMinutes  = today.getHours() * 60 + today.getMinutes()
   const isToday     = selectedDate === dateStr(today)
 
-  const daySchedules = schedules
-    .filter((s: any) => s.date === selectedDate)
+  // ✅ FIX: usa getSchedulesForDate em vez de s.date === selectedDate
+  // Isso respeita recorrências semanais, mensais e quinzenais
+  const daySchedules = getSchedulesForDate(schedules, selectedDate)
     .sort((a: any, b: any) => a.time.localeCompare(b.time))
 
   const scheduleBlocks = daySchedules.map((s: any) => {

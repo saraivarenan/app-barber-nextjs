@@ -67,7 +67,6 @@ export default function ScheduleModal({ editId, preDate, preTime, schedules, con
     }
   }
 
-  // Calculate end time from start + duration
   function calcEndTime(startTime: string, dur: number) {
     const [h, m] = startTime.split(':').map(Number)
     const total  = h * 60 + m + dur
@@ -81,9 +80,30 @@ export default function ScheduleModal({ editId, preDate, preTime, schedules, con
     c.name.toLowerCase().includes(cpSearch.toLowerCase()) || (c.phone||'').includes(cpSearch)
   )
 
+  // ✅ FIX: ao trocar o tipo de recorrência, pré-popula recurDays corretamente
+  function handleSetRecurrence(v: 'none' | 'weekly' | 'bimonthly' | 'monthly') {
+    setRecurrence(v)
+    if (v === 'weekly') {
+      // Pré-seleciona o dia da semana correspondente à data escolhida
+      const dow = new Date(date + 'T00:00:00').getDay()
+      setRecurDays([dow])
+    } else {
+      setRecurDays([])
+    }
+  }
+
   async function handleSave() {
     if (!client || !date || !time) { setError('Preencha cliente, data e horário'); return }
-    // Check overlap: conflict if another schedule starts during this one's window
+
+    // ✅ FIX: valida que ao menos um dia foi selecionado para recorrências
+    if (
+      (recurrence === 'weekly' || recurrence === 'bimonthly' || recurrence === 'monthly') &&
+      recurDays.length === 0
+    ) {
+      setError('Selecione pelo menos um dia para a recorrência')
+      return
+    }
+
     const [sh, sm] = time.split(':').map(Number)
     const startMin = sh * 60 + sm
     const endMin   = startMin + duration
@@ -245,7 +265,8 @@ export default function ScheduleModal({ editId, preDate, preTime, schedules, con
             {(['none','weekly','bimonthly','monthly'] as const).map(v => (
               <div key={v}
                 className={`recur-opt ${recurrence === v ? 'selected' : ''}`}
-                onClick={() => { setRecurrence(v); setRecurDays([]) }}
+                // ✅ FIX: usa handleSetRecurrence em vez de setRecurrence + setRecurDays([])
+                onClick={() => handleSetRecurrence(v)}
               >
                 {{ none:'Sem recorrência', weekly:'Semanal', bimonthly:'2x por mês', monthly:'Mensal' }[v]}
               </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { SessionUser } from '@/lib/auth'
-import { dateStr } from '@/lib/recurrence'
+import { dateStr, getSchedulesForDate } from '@/lib/recurrence'  // ✅ importa getSchedulesForDate
 import DayTimeline from './DayTimeline'
 import { logoutAction } from '@/actions/auth'
 
@@ -23,7 +23,8 @@ export default function HomeClient({ session, schedules, contacts, services }: P
   const greeting = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'
   const firstName = session.name.split(' ')[0]
 
-  const todaySchedules = schedules.filter((s: any) => s.date === todayStr)
+  // ✅ FIX: usa getSchedulesForDate para contar corretamente agendamentos recorrentes de hoje
+  const todaySchedules = getSchedulesForDate(schedules, todayStr)
   const total          = schedules.length
   const uniqueClients  = new Set(schedules.map((s: any) => s.client.toLowerCase())).size
 
