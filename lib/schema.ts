@@ -43,7 +43,16 @@ export const schedules = pgTable('schedules', {
   createdAt:  timestamp('created_at').defaultNow(),
 })
 
+export const schedule_exceptions = pgTable('schedule_exceptions', {
+  id: serial('id').primaryKey(),
+  scheduleId: integer('schedule_id')
+    .notNull()
+    .references(() => schedules.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),
+})
+
 export type User     = typeof users.$inferSelect
 export type Service  = typeof services.$inferSelect
 export type Contact  = typeof contacts.$inferSelect
 export type Schedule = typeof schedules.$inferSelect
+export type ScheduleException = typeof schedule_exceptions.$inferSelect

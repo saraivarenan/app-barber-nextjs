@@ -2,10 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { createDb } from '@/lib/db'
-import { schedules } from '@/lib/schema'
+import { schedules, schedule_exceptions } from '@/lib/schema'
 import { eq, and } from 'drizzle-orm'
 import { getSession } from '@/lib/auth'
 import { dateStr, parseDate, Schedule } from '@/lib/recurrence'
+
 
 export async function getSchedules() {
   const session = await getSession()
@@ -15,7 +16,15 @@ export async function getSchedules() {
     where: eq(schedules.userId, session.id),
     orderBy: (s, { asc }) => [asc(s.date), asc(s.time)]
   })
-  return rows.map(s => ({ ...s, recurDays: JSON.parse(s.recurDays || '[]') }))
+  const exceptions = await db.query.schedule_exceptions.findMany()
+
+return rows.map(s => ({
+  ...s,
+  recurDays: JSON.parse(s.recurDays || '[]'),
+  exceptions: exceptions
+    .filter(e => e.scheduleId === s.id)
+    .map(e => e.date)
+}))
 }
 
 export async function createSchedule(data: {
@@ -72,28 +81,48 @@ export async function updateSchedule(id: number, data: {
   return { ...row, recurDays: data.recurDays }
 }
 
-export async function deleteSchedule(id: number) {
+// 🔥 ALTERADO: agora suporta exclusão por ocorrência
+export async function deleteSchedule(id: number, date?: string) {
   const session = await getSession()
   if (!session) return { error: 'Não autorizado' }
+
   const db = createDb()
-  await db.delete(schedules).where(and(eq(schedules.id, id), eq(schedules.userId, session.id)))
-  revalidatePath('/home')
-  revalidatePath('/calendar')
+
+  if (!date) {
+    await db.delete(schedules)
+      .where(and(eq(schedules.id, id), eq(schedules.userId, session.id)))
+
+    return { success: true }
+  }
+
+  await db.insert(schedule_exceptions).values({
+    scheduleId: id,
+    date,
+  })
+
   return { success: true }
 }
 
 export async function getOccurrences(s: Schedule, fromDate: Date, toDate: Date): Promise<string[]> {
+  const db = createDb()
+
+  // 🔥 busca exceções
+  const exceptions = await db.query.schedule_exceptions.findMany({
+    where: eq(schedule_exceptions.scheduleId, s.id)
+  })
+
+  const exceptionDates = new Set(exceptions.map(e => e.date))
+
   const results: string[] = []
   const base  = parseDate(s.date)
   const recur = s.recurrence || 'none'
 
   if (recur === 'none') {
     if (base >= fromDate && base <= toDate) results.push(dateStr(base))
-    return results
+    return results.filter(d => !exceptionDates.has(d))
   }
 
   if (recur === 'weekly') {
-    // ✅ Garante que sempre usa o dia original como fallback
     const wds = (s.recurDays && s.recurDays.length > 0)
       ? s.recurDays
       : [base.getDay()]
@@ -103,10 +132,11 @@ export async function getOccurrences(s: Schedule, fromDate: Date, toDate: Date):
       if (wds.includes(cur.getDay())) results.push(dateStr(cur))
       cur.setDate(cur.getDate() + 1)
     }
-    return results
-  }
 
-  // monthly / bimonthly
+    return results.filter(d => !exceptionDates.has(d))
+  }
+  
+
   const domList = (s.recurDays && s.recurDays.length > 0)
     ? s.recurDays
     : [base.getDate()]
@@ -123,5 +153,6 @@ export async function getOccurrences(s: Schedule, fromDate: Date, toDate: Date):
     m++
     if (m > 11) { m = 0; y++ }
   }
-  return results
+
+  return results.filter(d => !exceptionDates.has(d))
 }

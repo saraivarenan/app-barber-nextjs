@@ -45,8 +45,16 @@ export default function DayTimeline({ selectedDate, schedules, contacts, service
 
   // ✅ FIX: usa getSchedulesForDate em vez de s.date === selectedDate
   // Isso respeita recorrências semanais, mensais e quinzenais
-  const daySchedules = getSchedulesForDate(schedules, selectedDate)
-    .sort((a: any, b: any) => a.time.localeCompare(b.time))
+const [daySchedules, setDaySchedules] = useState<any[]>([])
+
+useEffect(() => {
+  async function load() {
+    const data = await getSchedulesForDate(schedules, selectedDate)
+    setDaySchedules(data.sort((a: any, b: any) => a.time.localeCompare(b.time)))
+  }
+
+  load()
+}, [schedules, selectedDate])
 
   const scheduleBlocks = daySchedules.map((s: any) => {
     const startMin = timeToMinutes(s.time)
