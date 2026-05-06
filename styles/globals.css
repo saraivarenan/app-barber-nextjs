@@ -14,6 +14,7 @@
   --radius:     14px;
   --font-body:  'DM Sans', sans-serif;
   --font-display: 'Playfair Display', serif;
+  --bottom-nav-height: calc(64px + env(safe-area-inset-bottom));
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,6 +47,8 @@ body {
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: var(--bottom-nav-height);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -86,6 +89,7 @@ body {
   background: var(--surface);
   border-top: 1px solid var(--border);
   display: flex;
+  min-height: var(--bottom-nav-height);
   z-index: 20;
 }
 .nav-item {
@@ -552,9 +556,10 @@ body {
 
 /* ── PROPORTIONAL TIMELINE ── */
 .tl-scroll {
-  margin: 0 20px 0;
-  height: calc(100vh - 240px);
+  margin: 0 20px 16px;
+  height: max(280px, calc(100dvh - 240px - var(--bottom-nav-height)));
   overflow-y: auto;
+  scroll-padding-bottom: var(--bottom-nav-height);
   border-radius: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
