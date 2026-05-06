@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createSchedule, updateSchedule, deleteSchedule } from '@/actions/schedules'
 import { createContact } from '@/actions/contacts'
-import { nextFreeSlot, dateStr } from '@/lib/recurrence'
+import { nextFreeSlot, dateStr, getSchedulesForDate } from '@/lib/recurrence'
 
 const WD = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 const MONTHS_S = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -123,8 +123,9 @@ export default function ScheduleModal({ editId, preDate, preTime, schedules, con
     const [sh, sm] = time.split(':').map(Number)
     const startMin = sh * 60 + sm
     const endMin = startMin + duration
-    const conflict = schedules.find((s: any) => {
-      if (s.date !== date || s.id === editId) return false
+    const daySchedules = getSchedulesForDate(schedules, date)
+    const conflict = daySchedules.find((s: any) => {
+      if (s.id === editId) return false
       const [eh, em] = s.time.split(':').map(Number)
       const sStart = eh * 60 + em
       const sEnd = sStart + (s.duration || 60)

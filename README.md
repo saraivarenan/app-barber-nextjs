@@ -126,3 +126,23 @@ barberbook/
 │   └── recurrence.ts    → Engine de recorrências
 └── styles/globals.css   → Estilos globais
 ```
+
+---
+
+## Converter para app no iPhone (PWA)
+
+Este projeto foi preparado como **PWA** (Progressive Web App), então você pode instalar no iPhone sem App Store.
+
+### O que foi adicionado
+- Manifesto web (`app/manifest.ts`) com modo `standalone`.
+- Ícone dinâmico (`app/icon.tsx`) e ícone Apple (`app/apple-icon.tsx`).
+- Metadados iOS no layout (`appleWebApp`, `themeColor`, `viewportFit`).
+
+### Como instalar no iPhone
+1. Faça deploy (ex.: Vercel) com HTTPS.
+2. Abra o link no **Safari** (não use Chrome para instalar).
+3. Toque em **Compartilhar**.
+4. Escolha **Adicionar à Tela de Início**.
+5. Confirme em **Adicionar**.
+
+Depois disso, o BarberBook abre em tela cheia, como aplicativo.

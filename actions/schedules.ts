@@ -88,10 +88,18 @@ export async function deleteSchedule(id: number, date?: string) {
 
   const db = createDb()
 
-  if (!date) {
+  const schedule = await db.query.schedules.findFirst({
+    where: and(eq(schedules.id, id), eq(schedules.userId, session.id))
+  })
+
+  if (!schedule) return { error: 'Agendamento não encontrado' }
+
+  if (!date || schedule.recurrence === 'none') {
     await db.delete(schedules)
       .where(and(eq(schedules.id, id), eq(schedules.userId, session.id)))
 
+    revalidatePath('/home')
+    revalidatePath('/calendar')
     return { success: true }
   }
 
@@ -100,6 +108,8 @@ export async function deleteSchedule(id: number, date?: string) {
     date,
   })
 
+  revalidatePath('/home')
+  revalidatePath('/calendar')
   return { success: true }
 }
 

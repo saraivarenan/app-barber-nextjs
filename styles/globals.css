@@ -14,6 +14,8 @@
   --radius:     14px;
   --font-body:  'DM Sans', sans-serif;
   --font-display: 'Playfair Display', serif;
+  --app-header-height: 68px;
+  --bottom-nav-height: calc(64px + env(safe-area-inset-bottom));
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,6 +30,14 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+
+/* iOS safe areas (notch / dynamic island) */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px }
 ::-webkit-scrollbar-track { background: transparent }
@@ -38,6 +48,9 @@ html, body {
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: var(--app-header-height);
+  padding-bottom: var(--bottom-nav-height);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -50,10 +63,15 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
+  min-height: var(--app-header-height);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
   z-index: 10;
 }
 .app-header h1 {
@@ -78,6 +96,7 @@ html, body {
   background: var(--surface);
   border-top: 1px solid var(--border);
   display: flex;
+  min-height: var(--bottom-nav-height);
   z-index: 20;
 }
 .nav-item {
@@ -85,21 +104,71 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
   gap: 3px;
   color: var(--muted);
   font-size: 11px;
   font-weight: 500;
   text-decoration: none;
-  transition: color .2s;
+  transition: color .2s, opacity .2s;
 }
 .nav-item:hover, .nav-item.active { color: var(--gold) }
+.bottom-nav.loading .nav-item { pointer-events: none }
+.bottom-nav.loading .nav-item:not(.pending) { opacity: .45 }
 .nav-icon { font-size: 20px }
+.nav-spinner,
+.header-spinner,
+.loading-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid rgba(201,168,76,.25);
+  border-top-color: var(--gold);
+  animation: spin .75s linear infinite;
+}
+.nav-spinner { width: 18px; height: 18px }
+.header-spinner { width: 20px; height: 20px }
+.loading-spinner { width: 24px; height: 24px }
+
+@keyframes spin {
+  to { transform: rotate(360deg) }
+}
 
 /* Page content */
 .page-content {
   flex: 1;
   padding: 16px 20px 100px;
+}
+
+.loading-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.loading-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 16px;
+}
+.loading-skeleton {
+  height: 56px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--surface), var(--card), var(--surface));
+  background-size: 220% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+.loading-skeleton.wide { height: 92px }
+.loading-skeleton.short { width: 65% }
+
+@keyframes shimmer {
+  0% { background-position: 100% 0 }
+  100% { background-position: -100% 0 }
 }
 
 /* Buttons */
@@ -544,9 +613,10 @@ html, body {
 
 /* ── PROPORTIONAL TIMELINE ── */
 .tl-scroll {
-  margin: 0 20px 0;
-  height: calc(100vh - 240px);
+  margin: 0 20px 16px;
+  height: max(280px, calc(100dvh - 240px - var(--bottom-nav-height)));
   overflow-y: auto;
+  scroll-padding-bottom: var(--bottom-nav-height);
   border-radius: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -653,7 +723,7 @@ html, body {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
 }
 .duration-opt {
-  padding: 10px 0; text-align: center; border-radius: 10px;
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); text-align: center; border-radius: 10px;
   border: 1px solid var(--border); font-size: 13px; font-weight: 600;
   color: var(--muted); cursor: pointer; transition: all .15s;
 }
